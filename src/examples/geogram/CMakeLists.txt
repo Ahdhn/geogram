@@ -8,3 +8,4 @@ add_subdirectory(opennl_basic_example)
 add_subdirectory(simple_raytrace)
 add_subdirectory(boolean_operations)
 add_subdirectory(intersect)
+add_subdirectory(def) #delaunay edge flip
