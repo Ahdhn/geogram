@@ -174,10 +174,8 @@ bool flip_face_edges(Mesh& M) {
                     // }
                     //
 
-                    //ret = true;
+                    ret = true;
                 }
-
-
             }
         }
     }
