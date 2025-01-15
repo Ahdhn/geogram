@@ -47,270 +47,187 @@
 #include <geogram/mesh/mesh_subdivision.h>
 #include <geogram/mesh/mesh_io.h>
 #include <geogram/NL/nl.h>
+#include <geogram/mesh/mesh_geometry.h>
 
-namespace {
-    using namespace GEO;
+#include <assert.h>
 
+using namespace GEO;
 
-    void mesh_smooth(Mesh* M, NLenum solver = NL_SOLVER_DEFAULT) {
+bool should_flip(vec3 p0, vec3 p1, vec3 p2, vec3 p3) {
 
-        // Chain corners around vertices
-        vector<index_t> v2c(M->vertices.nb(), index_t(-1));
-        vector<index_t> next_c_around_v(M->facet_corners.nb(), index_t(-1));
-        vector<index_t> c2f(M->facet_corners.nb(), index_t(-1));
-        for(index_t f=0; f<M->facets.nb(); ++f) {
-            for(index_t c=M->facets.corners_begin(f);
-                c<M->facets.corners_end(f); ++c
-               ) {
-                index_t v = M->facet_corners.vertex(c);
-                next_c_around_v[c] = v2c[v];
-                v2c[v] = c;
-                c2f[c] = f;
-            }
-        }
+    //p0-p1 is the edge 
+    //p2 and p3 are the two opposite vertices 
 
-        nlNewContext();
-
-        if(solver == NL_SUPERLU_EXT || solver == NL_PERM_SUPERLU_EXT) {
-            if(nlInitExtension("SUPERLU")) {
-                nlSolverParameteri(NL_SOLVER, NLint(solver));
-            } else {
-                Logger::err("NL") << "Could not init SUPERLU extension";
-            }
-        } else if(solver == NL_CHOLMOD_EXT) {
-            if(nlInitExtension("CHOLMOD")) {
-                nlSolverParameteri(NL_SOLVER, NLint(solver));
-            } else {
-                Logger::err("NL") << "Could not init CHOLMOD extension";
-            }
-        }
-
-        nlSolverParameteri(NL_LEAST_SQUARES, NL_TRUE);
-        nlSolverParameteri(NL_NB_VARIABLES, NLint(M->vertices.nb()));
-        nlSolverParameteri(NL_NB_SYSTEMS, NLint(M->vertices.dimension()));
-        nlEnable(NL_NORMALIZE_ROWS);
-        nlEnable(NL_VARIABLES_BUFFER);
-
-        Attribute<bool> v_is_locked(M->vertices.attributes(), "selection");
-
-        nlBegin(NL_SYSTEM);
-
-        for(index_t coord=0; coord<M->vertices.dimension(); ++coord) {
-            // Bind directly the variables buffer to the coordinates in
-            // the mesh, to avoid copying data.
-            nlBindBuffer(
-                NL_VARIABLES_BUFFER, NLuint(coord),
-                M->vertices.point_ptr(0) + coord,
-                NLuint(sizeof(double)*M->vertices.dimension())
-            );
-        }
-
-        for(index_t v=0; v<M->vertices.nb(); ++v) {
-            if(v_is_locked[v]) {
-                nlLockVariable(v);
-            }
-        }
-
-        nlBegin(NL_MATRIX);
-        for(index_t v=0; v<M->vertices.nb(); ++v) {
-            nlBegin(NL_ROW);
-            index_t count = 0;
-            for(
-                index_t c = v2c[v];
-                c != index_t(-1); c = next_c_around_v[c]
-            ) {
-                index_t f = c2f[c];
-                index_t c2 = M->facets.next_corner_around_facet(f,c);
-                index_t w = M->facet_corners.vertex(c2);
-                nlCoefficient(w, 1.0);
-                ++count;
-            }
-            nlCoefficient(v, -double(count));
-            nlEnd(NL_ROW);
-        }
-        nlEnd(NL_MATRIX);
-        nlEnd(NL_SYSTEM);
-
-        Logger::div("Solve");
-        nlSolve();
-
-        nlDeleteContext(nlGetCurrent());
-    }
-}
-
-/*
- * Turns out M->edges is not actually populated
- * during mesh construction!
- */
-void delete_an_edges_test(Mesh* M) {
-    vector<index_t> delete_e(M->edges.nb(),0);
-    for(index_t e=0; e<M->edges.nb()/2; ++e) {
-        delete_e[e] = 1;
-    }
-    M->edges.delete_elements(delete_e);
-}
-
-void delete_faces_test(Mesh& M) {
-    vector<index_t> delete_f(M.facets.nb(),0);
-    for(index_t f=0; f<M.facets.nb()/4; ++f) {
-        delete_f[f] = 1;
-    }
-    M.facets.delete_elements(delete_f);
-}
-
-// just a work in progress
-void angle_test() {
-    // find the angle between S, M, Q vertices (i.e., angle at M)
     auto angle_between_three_vertices =
-        [](vec3& S,
-           vec3& M,
-           vec3& Q) {
+        [](vec3& S, vec3& M, vec3& Q) {
 
-            vec3 p1      = S - M;
-            vec3 p2      = Q - M;
-            double dot_pro = dot(p1, p2);// p1.dot(p2);
+        vec3 p1 = S - M;
+        vec3 p2 = Q - M;
+        auto dot_pro = dot(p1, p2);
 
-            return acos(dot_pro / (length(p1) * length(p2)) );
+        return acos(dot_pro / (length(p1) * length(p2)));
+        };
 
-            //        if constexpr (std::is_same_v<T, float>) {
-            //            return acosf(dot_pro / (p1.norm() * p2.norm()));
-            //        } else {
-            //            return acos(dot_pro / (p1.norm() * p2.norm()));
-            //        }
-    };
-    vec3 p0, p1, p2;
-    auto angle = angle_between_three_vertices(p0, p1, p2);
-}
-void explore_mesh_connectivity(Mesh& M) {
 
-    //for(index_t f=0; f<M.facets.nb(); ++f) {
-    for (index_t f : M.facets) {
-        std::cout << "f " << f << "\n";
-        std::cout << "\tvids: ";
-        // Look at a face's vertex indicies
-        for (index_t lv = 0; lv < M.facets.nb_vertices(f); ++lv) {
-            index_t v = M.facets.vertex(f, lv);
-            std::cout << v << " ";
+    // first check if the edge formed by v0-v1 is a delaunay edge
+    // where v2 and v3 are the opposite vertices to the edge
+    /*
+        0
+      / | \
+     3  |  2
+     \  |  /
+        1
+    */
+    // if not delaunay, then we check if flipping it won't create a
+    // foldover The case below would create a fold over
+    /*
+          0
+        / | \
+       /  1  \
+      / /  \  \
+      2       3
+    */
+
+    auto lambda = angle_between_three_vertices(p0, p2, p1);
+    auto gamma = angle_between_three_vertices(p0, p3, p1);
+
+    constexpr float PII = 3.14159265358979323f;
+
+    if (lambda + gamma > PII + std::numeric_limits<float>::epsilon()) {
+        // check if flipping won't create foldover
+
+        auto alpha0 = angle_between_three_vertices(p3, p0, p1);
+        auto beta0 = angle_between_three_vertices(p2, p0, p1);
+
+        auto alpha1 = angle_between_three_vertices(p3, p1, p0);
+        auto beta1 = angle_between_three_vertices(p2, p1, p0);
+
+        if (alpha0 + beta0 < PII - std::numeric_limits<float>::epsilon() &&
+            alpha1 + beta1 < PII - std::numeric_limits<float>::epsilon()) {
+            return true;
         }
-        std::cout << "\n\n";
-
-        // Look at a face's corners
-        for (index_t c = M.facets.corners_begin(f); c != M.facets.corners_end(f); ++c) {
-            std::cout << "\tcorner " << c
-                << ": vertex " << M.facet_corners.vertex(c)
-                << "\n";
-        }
-        std::cout << "\n";
-        std::cout << "\tGiven a face's local edge, get an adjacent face.\n";
-        std::cout << "\tThen, ask that face for a face adjacent to it.\n";
-        // Given a local edge index, find a face adjacent to the edge
-        for (index_t e = 0; e < 3; ++e) {
-            auto fa = M.facets.adjacent(f, e);
-            std::cout << "\te" << e << " fa: " << fa;
-            std::cout << " fa " << ": " << M.facets.adjacent(fa, e) << std::endl;
-        }
-
-        for(index_t c = M.facets.corners_begin(f);
-            c < M.facets.corners_end(f); ++c) {
-
-            }
-        std::cout << "----------" << std::endl;
-
-        // std::cout << "f: " << f << " verts: " << M.facets.nb_vertices(f);
-        // std::cout << " corners: " << M.facets.nb_corners(f) << std::endl;
     }
 
-    // Output some mesh stats at the end here
-    std::cout << "vertices.nb(): " << M.vertices.nb() << std::endl;
-    std::cout << "facets.nb(): " << M.facets.nb() << std::endl;
-    std::cout << "edges.nb(): " << M.edges.nb() << std::endl;
-    std::cout << "facet_corners.nb(): " << M.facet_corners.nb() << std::endl;
+    return false;
 }
+
+
+index_t find_thrid_vertex(Mesh& M, index_t f, index_t v1, index_t v2) {
+    //given a face and two vertices of this face, find the third vertex of this face
+
+    for (index_t c : M.facets.corners(f)) {
+        if (M.facet_corners.vertex(c) != v1 && M.facet_corners.vertex(c) != v2) {
+            return M.facet_corners.vertex(c);
+        }
+    }
+    return NO_VERTEX;
+}
+
+bool flip_face_edges(Mesh& M) {
+    //iterate over edges of this face and flip any if needed
+
+    bool ret = false;
+
+    for (index_t f : M.facets) {
+        for (index_t c1 : M.facets.corners(f)) {
+            index_t opposite_f = M.facet_corners.adjacent_facet(c1);
+            if (opposite_f != NO_FACET) {
+                index_t c2 = M.facets.next_corner_around_facet(f, c1);
+
+                index_t c3 = M.facets.next_corner_around_facet(f, c2);
+
+                //the edge vertices 
+                index_t v1 = M.facet_corners.vertex(c1);
+                index_t v2 = M.facet_corners.vertex(c2);
+
+                //opposite vertices 
+                index_t v3 = M.facet_corners.vertex(c3);
+                index_t v4 = find_thrid_vertex(M, opposite_f, v1, v2);
+
+                assert(v4 != NO_VERTEX);
+
+                vec3 p1 = Geom::mesh_vertex(M, v1);
+                vec3 p2 = Geom::mesh_vertex(M, v2);
+                vec3 p3 = Geom::mesh_vertex(M, v3);
+                vec3 p4 = Geom::mesh_vertex(M, v4);
+
+                if (should_flip(p1, p2, p3, p4)) {
+
+                    // TODO
+                    // 
+                    //M.facets.set_vertex(f, 0, v1);
+                    //M.facets.set_vertex(f, 1, v4);
+                    //M.facets.set_vertex(f, 2, v3);
+                    //
+                    //M.facets.set_vertex(opposite_f, 0, v4);
+                    //M.facets.set_vertex(opposite_f, 1, v2);
+                    //M.facets.set_vertex(opposite_f, 2, v3);
+
+                    //also need to change "adjacent facets" so that "adjacent_facet" points to the right face next time
+                    //  for(index_t c: M.facet_corners) {
+                    //   M.facet_corners.set_adjacent_facet(c, FFF);
+                    // }
+
+                    // also need to change corner vertex 
+                    //  for(index_t c: M.facet_corners) {
+                    //   M.facet_corners.set_vertex(c, VVV);
+                    // }
+                    //
+
+                    //ret = true;
+                }
+
+
+            }
+        }
+    }
+
+    return ret;
+
+}
+
+
 int main(int argc, char** argv) {
-    using namespace GEO;
 
     GEO::initialize(GEO::GEOGRAM_INSTALL_ALL);
 
     try {
-        Stopwatch Wtot("Total time");
 
         std::vector<std::string> filenames;
 
-        CmdLine::import_arg_group("standard");
-        CmdLine::import_arg_group("algo");
-        CmdLine::declare_arg(
-            "solver", "NL_SOLVER_DEFAULT", "solver"
-        );
-        CmdLine::declare_arg(
-            "nb_subdivide", 0, "number of times mesh is subdivided"
-        );
-
-        if(
-            !CmdLine::parse(
-                argc, argv, filenames, "inmesh <outmesh>"
-            )
-        ) {
+        if (!CmdLine::parse(argc, argv, filenames, "inmesh <outmesh>")) {
             return 1;
         }
-
-
-        if(filenames.size() != 2) {
-            Logger::out("Smooth") << "Generating output to out.geogram"
-                                  << std::endl;
-            filenames.push_back("out.geogram");
-        }
-
-        Logger::div("Data I/O");
 
         Mesh M;
 
         MeshIOFlags flags;
         flags.reset_element(MESH_CELLS);
         flags.set_attributes(MESH_ALL_ATTRIBUTES);
-        if(!mesh_load(filenames[0], M, flags)) {
+        if (!mesh_load(filenames[0], M, flags)) {
             return 1;
         }
 
-        explore_mesh_connectivity(M);
+        std::cout << "\n #### Input #Faces= " << M.facets.nb()
+            << " #Vertices=" << M.vertices.nb() << "\n";
 
-        std::cout << "delete some edges\n";
-        delete_an_edges_test(&M);
+        auto start = std::chrono::high_resolution_clock::now();
 
-        std::cout << "delete some faces\n";
-        delete_faces_test(M);
 
-        // {
-        //     Attribute<bool> is_locked(M.vertices.attributes(), "selection");
-        //     for(index_t v=0; v<M.vertices.nb(); ++v) {
-        //         is_locked[v] = true;
-        //     }
-        //     for(index_t i=0; i<CmdLine::get_arg_uint("nb_subdivide"); ++i) {
-        //         mesh_split_triangles(M);
-        //     }
-        // }
+        while (flip_face_edges(M)) {}
 
-        // NLenum solver = NL_SOLVER_DEFAULT;
-        // std::string solver_string = CmdLine::get_arg("solver");
-        // if(solver_string == "NL_CG") {
-        //     solver = NL_CG;
-        // } else if(solver_string == "NL_SUPERLU_EXT") {
-        //     solver = NL_SUPERLU_EXT;
-        // } else if(solver_string == "NL_PERM_SUPERLU_EXT") {
-        //     solver = NL_PERM_SUPERLU_EXT;
-        // } else if(solver_string == "NL_SYMMETRIC_SUPERLU_EXT") {
-        //     solver = NL_SYMMETRIC_SUPERLU_EXT;
-        // } else if(solver_string == "NL_CHOLMOD_EXT") {
-        //     solver = NL_CHOLMOD_EXT;
-        // }
+        auto stop = std::chrono::high_resolution_clock::now();
 
-        // mesh_smooth(&M, solver);
+        std::cout << "\n $$$$ Delaunay Edge Flip took = "
+            << std::chrono::duration<float, std::milli>(stop - start).count()
+            << "(ms)\n";
 
-        if(!mesh_save(M, filenames[1], flags)) {
+        if (!mesh_save(M, filenames[1], flags)) {
             return 1;
         }
 
     }
-    catch(const std::exception& e) {
+    catch (const std::exception& e) {
         std::cerr << "Received an exception: " << e.what() << std::endl;
         return 1;
     }
