@@ -1,4 +1,4 @@
-[  0%] Building C object src/lib/geogram/third_party/CMakeFiles/geogram_third_party.dir/libMeshb/sources/libmeshb7.c.o
+[  1%] Building C object src/lib/geogram/third_party/CMakeFiles/geogram_third_party.dir/libMeshb/sources/libmeshb7.c.o
 [  1%] Building C object src/lib/geogram/third_party/CMakeFiles/geogram_third_party.dir/rply/rply.c.o
 [  1%] Building C object src/lib/geogram/third_party/CMakeFiles/geogram_third_party.dir/zlib/adler32.c.o
 [  2%] Building C object src/lib/geogram/third_party/CMakeFiles/geogram_third_party.dir/zlib/compress.c.o
@@ -21,7 +21,7 @@
 [ 10%] Building CXX object src/lib/geogram/third_party/CMakeFiles/geogram_third_party.dir/PoissonRecon/poisson_geogram.cpp.o
 [ 10%] Building CXX object src/lib/geogram/third_party/CMakeFiles/geogram_third_party.dir/xatlas/xatlas.cpp.o
 [ 10%] Built target geogram_third_party
-[ 10%] Building CXX object src/lib/geogram/CMakeFiles/geogram.dir/basic/android_utils.cpp.o
+[ 11%] Building CXX object src/lib/geogram/CMakeFiles/geogram.dir/basic/android_utils.cpp.o
 [ 11%] Building CXX object src/lib/geogram/CMakeFiles/geogram.dir/basic/algorithm.cpp.o
 [ 12%] Building CXX object src/lib/geogram/CMakeFiles/geogram.dir/basic/assert.cpp.o
 [ 12%] Building CXX object src/lib/geogram/CMakeFiles/geogram.dir/basic/attributes.cpp.o
@@ -224,15 +224,17 @@
 [ 99%] Linking CXX executable ../../../../bin/boolean_op
 [ 99%] Built target boolean_op
 [100%] Building CXX object src/examples/geogram/def/CMakeFiles/def.dir/main.cpp.o
-/home/runner/work/geogram/geogram/src/examples/geogram/def/main.cpp: In function ‘void angle_test()’:
-/home/runner/work/geogram/geogram/src/examples/geogram/def/main.cpp:182:10: warning: unused variable ‘angle’ [-Wunused-variable]
-  182 |     auto angle = angle_between_three_vertices(p0, p1, p2);
-      |          ^~~~~
-/home/runner/work/geogram/geogram/src/examples/geogram/def/main.cpp: At global scope:
-/home/runner/work/geogram/geogram/src/examples/geogram/def/main.cpp:55:10: warning: ‘void {anonymous}::mesh_smooth(GEO::Mesh*, NLenum)’ defined but not used [-Wunused-function]
-   55 |     void mesh_smooth(Mesh* M, NLenum solver = NL_SOLVER_DEFAULT) {
-      |          ^~~~~~~~~~~
+/home/runner/work/geogram/geogram/src/examples/geogram/def/main.cpp: In function ‘bool should_flip(GEO::vec3, GEO::vec3, GEO::vec3, GEO::vec3)’:
+/home/runner/work/geogram/geogram/src/examples/geogram/def/main.cpp:96:24: warning: implicit conversion from ‘float’ to ‘double’ to match other operand of binary expression [-Wdouble-promotion]
+   96 |     if (lambda + gamma > PII + std::numeric_limits<float>::epsilon()) {
+      |         ~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/geogram/geogram/src/examples/geogram/def/main.cpp:105:28: warning: implicit conversion from ‘float’ to ‘double’ to match other operand of binary expression [-Wdouble-promotion]
+  105 |         if (alpha0 + beta0 < PII - std::numeric_limits<float>::epsilon() &&
+      |             ~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/geogram/geogram/src/examples/geogram/def/main.cpp:106:28: warning: implicit conversion from ‘float’ to ‘double’ to match other operand of binary expression [-Wdouble-promotion]
+  106 |             alpha1 + beta1 < PII - std::numeric_limits<float>::epsilon()) {
+      |             ~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 [100%] Linking CXX executable ../../../../bin/intersect
-[100%] Built target intersect
 [100%] Linking CXX executable ../../../../bin/def
+[100%] Built target intersect
 [100%] Built target def
