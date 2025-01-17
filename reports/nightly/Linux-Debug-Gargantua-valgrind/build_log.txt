@@ -21,8 +21,8 @@
 [ 10%] Building CXX object src/lib/geogram/third_party/CMakeFiles/geogram_third_party.dir/PoissonRecon/poisson_geogram.cpp.o
 [ 10%] Building CXX object src/lib/geogram/third_party/CMakeFiles/geogram_third_party.dir/xatlas/xatlas.cpp.o
 [ 10%] Built target geogram_third_party
-[ 11%] Building CXX object src/lib/geogram/CMakeFiles/geogram.dir/basic/android_utils.cpp.o
 [ 11%] Building CXX object src/lib/geogram/CMakeFiles/geogram.dir/basic/algorithm.cpp.o
+[ 11%] Building CXX object src/lib/geogram/CMakeFiles/geogram.dir/basic/android_utils.cpp.o
 [ 12%] Building CXX object src/lib/geogram/CMakeFiles/geogram.dir/basic/assert.cpp.o
 [ 12%] Building CXX object src/lib/geogram/CMakeFiles/geogram.dir/basic/attributes.cpp.o
 [ 13%] Building CXX object src/lib/geogram/CMakeFiles/geogram.dir/basic/b_stream.cpp.o
@@ -170,9 +170,9 @@
 [ 79%] Building CXX object src/tests/test_nn_search/CMakeFiles/test_nn_search.dir/third_party/ANN/brute.cpp.o
 [ 80%] Building CXX object src/tests/test_nn_search/CMakeFiles/test_nn_search.dir/third_party/ANN/kd_dump.cpp.o
 [ 80%] Linking CXX executable ../../../bin/test_locks
-[ 80%] Building CXX object src/tests/test_nn_search/CMakeFiles/test_nn_search.dir/third_party/ANN/kd_fix_rad_search.cpp.o
 [ 80%] Built target test_locks
 [ 81%] Building CXX object src/tests/test_expansion_nt/CMakeFiles/test_expansion_nt.dir/main.cpp.o
+[ 81%] Building CXX object src/tests/test_nn_search/CMakeFiles/test_nn_search.dir/third_party/ANN/kd_fix_rad_search.cpp.o
 [ 82%] Building CXX object src/tests/test_nn_search/CMakeFiles/test_nn_search.dir/third_party/ANN/kd_pr_search.cpp.o
 [ 82%] Linking CXX executable ../../../bin/test_expansion_nt
 [ 82%] Built target test_expansion_nt
@@ -185,9 +185,9 @@
 [ 85%] Building CXX object src/tests/test_nn_search/CMakeFiles/test_nn_search.dir/third_party/ANN/kd_tree.cpp.o
 [ 86%] Building CXX object src/tests/test_nn_search/CMakeFiles/test_nn_search.dir/third_party/ANN/kd_util.cpp.o
 [ 86%] Linking CXX executable ../../../bin/test_RVC
-[ 86%] Building CXX object src/tests/test_nn_search/CMakeFiles/test_nn_search.dir/third_party/ANN/perf.cpp.o
 [ 86%] Built target test_RVC
 [ 87%] Building CXX object src/tests/test_logger/CMakeFiles/test_logger.dir/main.cpp.o
+[ 87%] Building CXX object src/tests/test_nn_search/CMakeFiles/test_nn_search.dir/third_party/ANN/perf.cpp.o
 [ 88%] Linking CXX executable ../../../bin/test_nn_search
 [ 88%] Built target test_nn_search
 [ 89%] Building CXX object src/tests/test_CDT_2d/CMakeFiles/test_CDT_2d.dir/main.cpp.o
@@ -218,11 +218,11 @@
 [ 97%] Linking CXX executable ../../../../bin/manifold_harmonics
 [ 97%] Built target manifold_harmonics
 [ 98%] Building CXX object src/examples/geogram/boolean_operations/CMakeFiles/boolean_op.dir/main.cpp.o
-[ 98%] Linking CXX executable ../../../../bin/simple_raytrace
 [ 98%] Linking CXX executable ../../../../bin/boolean_op
-[ 98%] Built target simple_raytrace
+[ 98%] Linking CXX executable ../../../../bin/simple_raytrace
+[ 98%] Built target boolean_op
 [ 99%] Building CXX object src/examples/geogram/intersect/CMakeFiles/intersect.dir/main.cpp.o
-[ 99%] Built target boolean_op
+[ 99%] Built target simple_raytrace
 [100%] Building CXX object src/examples/geogram/def/CMakeFiles/def.dir/main.cpp.o
 /home/runner/work/geogram/geogram/src/examples/geogram/def/main.cpp: In function ‘bool should_flip(GEO::vec3, GEO::vec3, GEO::vec3, GEO::vec3)’:
 /home/runner/work/geogram/geogram/src/examples/geogram/def/main.cpp:96:24: warning: implicit conversion from ‘float’ to ‘double’ to match other operand of binary expression [-Wdouble-promotion]
@@ -234,7 +234,7 @@
 /home/runner/work/geogram/geogram/src/examples/geogram/def/main.cpp:106:28: warning: implicit conversion from ‘float’ to ‘double’ to match other operand of binary expression [-Wdouble-promotion]
   106 |             alpha1 + beta1 < PII - std::numeric_limits<float>::epsilon()) {
       |             ~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-[100%] Linking CXX executable ../../../../bin/def
 [100%] Linking CXX executable ../../../../bin/intersect
+[100%] Linking CXX executable ../../../../bin/def
 [100%] Built target intersect
 [100%] Built target def
