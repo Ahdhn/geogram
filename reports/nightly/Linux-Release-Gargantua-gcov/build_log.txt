@@ -219,9 +219,9 @@
 [ 97%] Built target manifold_harmonics
 [ 98%] Building CXX object src/examples/geogram/boolean_operations/CMakeFiles/boolean_op.dir/main.cpp.o
 [ 98%] Linking CXX executable ../../../../bin/simple_raytrace
-[ 98%] Linking CXX executable ../../../../bin/boolean_op
 [ 98%] Built target simple_raytrace
 [ 99%] Building CXX object src/examples/geogram/intersect/CMakeFiles/intersect.dir/main.cpp.o
+[ 99%] Linking CXX executable ../../../../bin/boolean_op
 [ 99%] Built target boolean_op
 [100%] Building CXX object src/examples/geogram/def/CMakeFiles/def.dir/main.cpp.o
 /home/runner/work/geogram/geogram/src/examples/geogram/def/main.cpp: In function ‘bool should_flip(GEO::vec3, GEO::vec3, GEO::vec3, GEO::vec3)’:
@@ -234,7 +234,7 @@
 /home/runner/work/geogram/geogram/src/examples/geogram/def/main.cpp:106:28: warning: implicit conversion from ‘float’ to ‘double’ to match other operand of binary expression [-Wdouble-promotion]
   106 |             alpha1 + beta1 < PII - std::numeric_limits<float>::epsilon()) {
       |             ~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-[100%] Linking CXX executable ../../../../bin/def
-[100%] Built target def
 [100%] Linking CXX executable ../../../../bin/intersect
+[100%] Linking CXX executable ../../../../bin/def
 [100%] Built target intersect
+[100%] Built target def
