@@ -12,8 +12,8 @@
   <line>Command: /home/runner/work/geogram/geogram/build/Linux64-gcc-dynamic-Release/bin/test_logger</line>
 </preamble>
 
-<pid>18675</pid>
-<ppid>12506</ppid>
+<pid>18377</pid>
+<ppid>12214</ppid>
 <tool>memcheck</tool>
 
 <args>
@@ -40,7 +40,7 @@
 
 <status>
   <state>FINISHED</state>
-  <time>00:00:00:02.461 </time>
+  <time>00:00:00:02.630 </time>
 </status>
 
 <error>
